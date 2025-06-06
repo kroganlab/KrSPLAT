@@ -1,0 +1,43 @@
+---
+title: "Step1_SetupEnvironment"
+author: "Max Bennett"
+date: "2025-06-06"
+output: html_document
+---
+
+```{r markdown options, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r load generic package librarires, include=FALSE}
+suppressPackageStartupMessages({
+library (data.table) # powerful syntax for data wrangling
+library (pbapply) # implements _apply functions with progress bars and parallelization
+library (rstudioapi) # 
+library (readxl) # reads excel files
+  })
+```
+
+```{r load packages for data visualization}
+suppressPackageStartupMessages({
+library (ggplot2) # modular plots
+library (ComplexHeatmap) # plots heatmaps
+library (viridis) # continuous color palettes 
+library (scico)  # discrete color palettes
+library (ggrepel) # adds force-directed labels to ggplot
+library (ggpubr) # adds features from graphpad prism to ggplot
+library (ggridges) # adds joyplots to ggplot
+library (pROC) # adds simple roc curve plot to ggplot 
+library (circlize) # adds circos plots and colorRamp2
+  })
+```
+
+```{r load packages for bioinformatics}
+suppressPackageStartupMessages({
+library (MSstats)
+library (clusterProfiler)
+library (fgsea)
+  })
+```
+
+
