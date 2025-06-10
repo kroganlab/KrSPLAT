@@ -1,0 +1,11 @@
+---
+  ggplot:
+    font: "mono"
+    theme: "theme_classic"
+  colors:
+    missing: "grey"
+    continuousPalette: "viridis"
+    divergingHigh:  "red"
+    divergingMid:  "white"
+    divergingLow: "blue"
+    

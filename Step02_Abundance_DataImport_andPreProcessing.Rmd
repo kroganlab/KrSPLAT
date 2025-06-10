@@ -1,0 +1,31 @@
+---
+title: "Step02_DataImport_andPreProcessing"
+author: "Max Bennett"
+date: "2025-06-06"
+output: html_document
+---
+
+# Import Mass Spectrometry Proteomic Data
+
+The following code has cases for importing data from each search tool, for your own use, you can copy the contents of only the relevant expression (make sure to assign the output to mssin).
+
+```{r Import peptide-level data}
+searchFileName <- "msstats.csv"
+
+#' for maxquant: uncomment and assign following variables 
+#' keys <- "keys.txt" # set to NA if condition names are already in maxquant evidence file
+#' pgs <- "proteinGroups.csv"
+  
+mssin <- switch(searchTool,
+       "spectronaut" = {spcntOutput <- fread("20241212_223026_AVD6_dirDIA_cEX_MSFormatReport.tsv")
+                        tmp <- spcntOutput[,  .(unique(Run))] [, BioReplicate := 1:nun(V1)] #make sure all bioreps are unique so msstats doesn't calculate batch effects
+                        spcntOutput[tmp, BioReplicate := i.BioReplicate, on = .(Run = V1)]   }, 
+       "maxquant" = {}, 
+       "fragpipe" = {frgpOutput <- fread("20241212_223026_AVD6_dirDIA_cEX_MSFormatReport.tsv")
+                        tmp <- frgpOutput[,  .(unique(Run))] [, BioReplicate := 1:nun(V1)] #make sure all bioreps are unique so msstats doesn't calculate batch effects
+                        frgpOutput[tmp, BioReplicate := i.BioReplicate, on = .(Run = V1)]
+                        frgpOutput[,PeptideModifiedSequence := PeptideSequence]
+                        frgpOutput[,IsotopeLabelType := "L"]   }, 
+       "diann"= {} )
+
+```

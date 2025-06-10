@@ -1,24 +1,71 @@
 ---
-title: "Step1_SetupEnvironment"
+title: "Step01_SetupEnvironment"
 author: "Max Bennett"
 date: "2025-06-06"
 output: html_document
 ---
 
+While KrSPLAT has been put together as something of an 'a la carte' resource that can be easily copy-pasted from, in order to improve ease of use for the resource as a whole, much of the code requires packages, helper functions, and variables established in this first document. To download helper functions, go to the [kroganlab github](https://github.com/kroganlab)
+
+# Project Settings
+
+Please review the names and paths in the following chunk carefully, they should all be specific to your project!
+
+```{r select local directories and naming}
+
+projectName <- "<replace with your project name>" # pick something short and recognizable, 
+                                                  # note that all saved files will have the datetime appended to the name, so you don't have to include that here.
+
+searchTool <- "spectronaut" # One of c("spectronaut", "maxquant", "fragpipe", "diann")
+
+experimentalVariables <- c("treatment") # list of experimental variable names, ex c("drug", "celltype", "infection"), c("drug", "taggedProtein")
+                                        # if more than one experimental variable is listed, Condition names in the input data are expected to be separated by underscores, in order
+                                        # ex. experimentalVariables = c("drug", "celltype", "infection")
+                                        # ex. Conditions = c("veh_HEK_uninf", "veh_HEK_uninf", "drug_HEK_inf", "drug_Macro_inf", etc. )
+
+inputDataFolder <- "./" # Filepath your input data is located in.
+                        # Default is the same directory as this .Rmd
+  
+outputDataFolder <- ""  # Filepath you want to save intermediate and final files to. This is for data and images.
+                        # Default is a blank string "", which will be automatically set to "<nameOfYourRmd>_data"
+
+autoSaveFigs <- T     # Default setting to save all generated figures (or not), this can be toggled at any point by changing the assigned value
+
+preferredFormat <- "pdf" # one of c("png", "pdf", "both")
+
+#' Ensure these filepaths to the bioinformatic team's helper functions are correct...
+#' If you do not already have them downloaded, they can be found on the kroganlab github (linked above). 
+bpUtilsPath <- "~/Documents/Code/bp_utils/"
+mbUtilsPath <- "~/Documents/Code/maxb_utils/"
+yzUtilsPath <- "~/Documents/Code/Yuan_utils/"
+# mgUtilsPath <- "./"   # Not in use currently
+  
+aestheticParameterFile <- "defaultAesthetics.yaml" # this is a developing feature, leave as default for now
+
+```
+
+# Automated Setup
+
+## Setup .Rmd Settings 
+
 ```{r markdown options, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+
+## Setup Package Libraries
 
 ```{r load generic package librarires, include=FALSE}
 suppressPackageStartupMessages({
 library (data.table) # powerful syntax for data wrangling
 library (pbapply) # implements _apply functions with progress bars and parallelization
 library (rstudioapi) # 
+library (devtools)  #
+library (yaml)      #
 library (readxl) # reads excel files
   })
 ```
 
-```{r load packages for data visualization}
+```{r load packages for data visualization, include=FALSE}
 suppressPackageStartupMessages({
 library (ggplot2) # modular plots
 library (ComplexHeatmap) # plots heatmaps
@@ -32,12 +79,31 @@ library (circlize) # adds circos plots and colorRamp2
   })
 ```
 
-```{r load packages for bioinformatics}
+```{r load packages for bioinformatics, include=FALSE}
 suppressPackageStartupMessages({
 library (MSstats)
 library (clusterProfiler)
 library (fgsea)
+library (cRomppass)
   })
 ```
 
+## Setup Local Environment
 
+```{r source helpers and local parameters, include=FALSE}
+source(file.path(bpUtilsPath, "ManageScriptData.R"))
+source(file.path(mbUtilsPath,"GenericHelpers.R"))
+
+```
+
+```{r create directories, include=FALSE}
+cat("Current directory is ", getwd())
+if ( !file.exists(paste0(getwd(),"/logs")) ){
+  cat("/logs directory does not exist--making /logs directory.")
+  dir.create(paste0(getwd(),"/logs"))     }
+dataFolder <- ScriptNamedDir()
+calledFrom <- substrLeft( tail(strsplit(dataFolder,"/") [[1]], n = 1), 0, -5 )
+cat("Logging installed package versions.")
+WriteSessionInfo(path = paste0( "./logs/", DateFileName(paste0(calledFrom, "_SessionInfo.txt")) ) )
+WriteInstalledPackages(path = paste0( "./logs/", DateFileName(paste0(calledFrom, "_InstalledPackages.txt")) ) )
+```
